@@ -1,11 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
-import { ChevronRight, Menu } from "lucide-react";
+
+import { ChevronRight, ChevronDown, Menu } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 export default function Navbar() {
   const [show, setShow] = useState(true);
   const [lastY, setLastY] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +22,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastY]);
 
+  // Tutup dropdown kalau klik di luar
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const menu = ["Home", "Kelas", "Tugas", "Chat", "Guru", "Prestasi", "Lainnya"];
 
   return (
@@ -28,7 +42,7 @@ export default function Navbar() {
         show ? "translate-y-0" : "-translate-y-full"
       )}
     >
-      {/* Top announcement */}
+      {/* --- Top announcement --- */}
       <div className="bg-blue-700 text-white text-sm text-center py-1">
         PPDB Angkatan 6 2026/2027 Telah Dibuka Kunjungi{" "}
         <a
@@ -41,41 +55,63 @@ export default function Navbar() {
         Untuk Informasi Lebih Lanjut <ChevronRight size={14} className="inline-block" />
       </div>
 
-      {/* Main navbar */}
-      <nav className="bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+      {/* --- Main navbar --- */}
+      <nav className="bg-white shadow-sm border-b border-gray-100 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-3">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-yellow-400 rounded-md flex items-center justify-center font-bold text-white">
-              <span>B</span>
+            <div className="w-8 h-8 bg-yellow-400 rounded-md flex items-center justify-center text-white font-bold">
+              B
             </div>
           </div>
 
-          {/* Menu desktop */}
-          <ul className="hidden md:flex items-center gap-8 text-[15px] font-medium text-gray-700">
+          {/* Menu tengah */}
+          <ul className="hidden md:flex items-center gap-8 text-[15px] font-medium text-gray-800 relative">
             {menu.map((item, i) => (
               <li
                 key={i}
                 className={clsx(
-                  "relative cursor-pointer hover:text-blue-600 transition-colors",
-                  item === "Home" ? "text-blue-600" : ""
+                  "relative flex items-center gap-1 px-4 py-1.5 rounded-md cursor-pointer transition-all duration-200 select-none",
+                  item === "Home"
+                    ? "bg-blue-700 text-white shadow-sm"
+                    : "hover:bg-gray-100 hover:text-blue-700"
                 )}
+                onClick={() => item === "Lainnya" && setDropdownOpen(!dropdownOpen)}
               >
                 {item}
-                <span
-                  className={clsx(
-                    "absolute left-0 -bottom-1 w-0 h-[2px] bg-blue-600 transition-all duration-300",
-                    "group-hover:w-full",
-                    item === "Home" ? "w-full" : ""
-                  )}
-                />
+                {item === "Lainnya" && (
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={2}
+                    className={clsx(
+                      "ml-1 transition-transform duration-200",
+                      dropdownOpen && "rotate-180"
+                    )}
+                  />
+                )}
+                {item === "Lainnya" && dropdownOpen && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute top-10 left-0 w-48 bg-white border border-gray-100 rounded-lg shadow-lg p-2 transition-all duration-200 animate-fadeIn"
+                  >
+                    <a className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                      Ekskul
+                    </a>
+                    <a className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                      Kegiatan
+                    </a>
+                    <a className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                      Kontak
+                    </a>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
 
-          {/* Buttons */}
+          {/* Tombol kanan */}
           <div className="hidden md:flex items-center gap-3">
-            <button className="px-4 py-1 text-sm font-medium border rounded-md hover:bg-gray-50">
+            <button className="px-4 py-1 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50">
               Sign Up
             </button>
             <button className="px-4 py-1 text-sm font-medium text-white bg-lime-600 hover:bg-lime-700 rounded-md">
@@ -83,9 +119,9 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Mobile menu icon */}
+          {/* Mobile icon */}
           <button className="md:hidden p-2 rounded-md hover:bg-gray-100">
-            <Menu size={20} />
+            <Menu size={22} />
           </button>
         </div>
       </nav>

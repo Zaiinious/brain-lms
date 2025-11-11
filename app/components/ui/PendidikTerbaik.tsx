@@ -7,22 +7,14 @@ const guru = [
 
 export default function PendidikTerbaik() {
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 text-center">
-        <h3 className="text-2xl font-semibold mb-8 text-gray-800">Pendidik Terbaik</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {guru.map((g) => (
-            <div
-              key={g.nama}
-              className="p-6 bg-white rounded-lg shadow hover:shadow-lg transition"
-            >
-              <div className="w-20 h-20 mx-auto bg-blue-100 rounded-full mb-3" />
-              <h4 className="font-semibold">{g.nama}</h4>
-              <p className="text-sm text-gray-500">{g.mapel}</p>
-            </div>
-          ))}
+    <div className="w-full max-w-7xl flex items-center justify-between relative">
+      <div className="flex items-center gap-4">
+          <h2 className="text-3xl font-bold leading-tight text-gray-800">
+            Pembelajaran
+            <br />
+            <span className="text-blue-600">Terpopuler</span>
+          </h2>
         </div>
-      </div>
-    </section>
-  );
+    </div>
+       );
 }
