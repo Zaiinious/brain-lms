@@ -1,13 +1,44 @@
-export default function Testimoni() {
+"use client";
+
+import { AnimatedTestimonials } from "@/components/animated-testimonials";
+
+export function Testimoni() {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-4xl mx-auto text-center px-6">
-        <h3 className="text-3xl font-bold mb-8 text-gray-800">#Kata<span className="text-blue-600">Mereka</span></h3>
-        <blockquote className="italic text-gray-600 max-w-2xl mx-auto">
-          “BRAIN membuat belajar jadi lebih seru. Materinya jelas, tampilannya keren, dan gurunya aktif banget!”
-        </blockquote>
-        <p className="mt-4 text-sm text-gray-500">— Siswa SMK BRAIN Indonesia</p>
-      </div>
+    <section className="relative w-full py-16 px-8 flex flex-col items-center bg-white pb-24">
+      <AnimatedTestimonials
+      testimonials={[
+        {
+          id: 1,
+          name: "Alex Johnson",
+          role: "Full Stack Developer",
+          company: "TechFlow",
+          content:
+            "This starter template saved me weeks of setup time. The Supabase integration is flawless, and the UI components are beautiful and easy to customize. Worth every penny!",
+          rating: 5,
+          avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+        },
+        {
+          id: 2,
+          name: "Sarah Miller",
+          role: "Frontend Engineer",
+          company: "DesignHub",
+          content:
+            "I've used many starter templates, but this one stands out for its clean architecture and attention to detail. The TypeScript support is excellent, and the documentation is comprehensive.",
+          rating: 5,
+          avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+        },
+        {
+          id: 3,
+          name: "Michael Chen",
+          role: "Product Manager",
+          company: "InnovateLabs",
+          content:
+            "Our team was able to launch our MVP in record time thanks to this template. The authentication flow and user management features worked right out of the box. Highly recommended!",
+          rating: 5,
+          avatar: "https://randomuser.me/api/portraits/men/46.jpg",
+        },
+      ]}
+    />
     </section>
   );
 }
