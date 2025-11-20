@@ -4,8 +4,8 @@ import { motion, type Variants } from "framer-motion";
 
 // Workaround: alias motion components to loose-typed components to avoid
 // conflicts between React DOM event types and Framer Motion prop types.
-const MotionDiv = motion.div as unknown as React.ComponentType<any>;
-const MotionImg = motion.img as unknown as React.ComponentType<any>;
+const MotionDiv = motion.div as unknown as React.ComponentType<Record<string, unknown>>;
+const MotionImg = motion.img as unknown as React.ComponentType<Record<string, unknown>>;
 import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils"; // Your shadcn/ui utils file

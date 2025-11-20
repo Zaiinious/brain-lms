@@ -1,100 +1,133 @@
+// app/components/ui/PembelajaranPopuler.tsx
 "use client";
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, ArrowLeft, ArrowRight, X, Globe, Code, Tangent, FolderCode, CodeXml, Bot } from "lucide-react";
 
-export default function PembelajaranPopuler() {
+import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  ArrowLeft,
+  ArrowRight,
+  X,
+  Globe,
+  Code,
+  Tangent,
+  FolderCode,
+  CodeXml,
+  Bot,
+} from "lucide-react";
+
+type Props = {
+  selectedClass: string;
+  tempSelected: string;
+  setTempSelected: (v: string) => void;
+  setSelectedClass: (v: string) => void;
+  searchTerm: string;
+  setSearchTerm: (s: string) => void;
+  onOpenSubject: (slug: string) => void;
+};
+
+export default function PembelajaranPopuler({
+  selectedClass,
+  tempSelected,
+  setTempSelected,
+  setSelectedClass,
+  searchTerm,
+  setSearchTerm,
+  onOpenSubject,
+}: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [selectedClass, setSelectedClass] = useState("10");
-  const [tempSelected, setTempSelected] = useState("10");
   const [showModal, setShowModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const subjects = {
+  const subjectsByClass: Record<string, string[]> = {
     "10": ["Dasar Desain Grafis", "Pemrograman Dasar", "Komputer & Jaringan"],
     "11": ["UI/UX Design", "Animasi 2D", "Jaringan Lanjut"],
     "12": ["Desain 3D", "Internet of Things", "Keamanan Jaringan"],
     "13": ["Proyek Akhir", "Kewirausahaan", "Pengembangan Produk"],
   };
 
-  // Data card dengan button object
+  // cards data (dummy)
   const cards = [
     {
       title: "Chat Collect",
       desc: "SaaS yang membantu mengumpulkan email pengguna GPT.",
-      image: "https://source.unsplash.com/400x300/?chat,ai",
+      image: "https://source.unsplash.com/600x400/?chat,ai",
       link: "https://chatcollect.com",
       stack: ["Next.js", "Typescript", "PostgreSQL", "Prisma"],
       button: {
         icon: Code,
         subject: "Pemrograman Dasar",
+        slug: "pemrograman-dasar",
       },
     },
     {
       title: "Edu Vision",
       desc: "Platform interaktif untuk materi pembelajaran visual.",
-      image: "https://source.unsplash.com/400x300/?education,visual",
+      image: "https://source.unsplash.com/600x400/?education,visual",
       link: "#",
       stack: ["React", "Node.js", "MongoDB", "Shadcn UI"],
       button: {
         icon: Tangent,
         subject: "Dasar Desain Grafis",
+        slug: "dasar-desain-grafis",
       },
     },
     {
       title: "DesignFlow",
       desc: "Alat bantu kolaborasi desainer dengan real-time feedback.",
-      image: "https://source.unsplash.com/400x300/?design,collaboration",
+      image: "https://source.unsplash.com/600x400/?design,collaboration",
       link: "#",
       stack: ["Figma API", "Next.js", "Framer Motion"],
       button: {
         icon: FolderCode,
         subject: "SaaS/Web Development",
+        slug: "web-development",
       },
     },
     {
       title: "CodeQuest",
       desc: "Game edukatif untuk belajar coding dari dasar.",
-      image: "https://source.unsplash.com/400x300/?coding,game",
+      image: "https://source.unsplash.com/600x400/?coding,game",
       link: "#",
       stack: ["React", "Supabase", "TailwindCSS"],
       button: {
         icon: CodeXml,
         subject: "Pemrograman Dasar",
+        slug: "pemrograman-dasar",
       },
     },
     {
       title: "NetworkPro",
       desc: "Simulasi jaringan sederhana untuk siswa SMK.",
-      image: "https://source.unsplash.com/400x300/?network,simulation",
+      image: "https://source.unsplash.com/600x400/?network,simulation",
       link: "#",
       stack: ["Python", "FastAPI", "PostgreSQL"],
       button: {
         icon: Globe,
         subject: "Komputer & Jaringan",
+        slug: "komputer-dan-jaringan",
       },
     },
     {
       title: "SmartClass",
       desc: "Sistem pembelajaran berbasis IoT untuk sekolah digital.",
-      image: "https://source.unsplash.com/400x300/?iot,classroom",
+      image: "https://source.unsplash.com/600x400/?iot,classroom",
       link: "#",
       stack: ["IoT", "MQTT", "Node.js"],
       button: {
         icon: Bot,
         subject: "Internet of Things",
+        slug: "internet-of-things",
       },
     },
   ];
 
   const cardWidth = 280;
-
   const handleScroll = (dir: "left" | "right") => {
     const newIndex =
       dir === "left"
         ? Math.max(0, activeIndex - 1)
-        : Math.min(cards.length - 4, activeIndex + 1);
+        : Math.min(cards.length - 3, activeIndex + 1);
     setActiveIndex(newIndex);
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -103,6 +136,17 @@ export default function PembelajaranPopuler() {
       });
     }
   };
+
+  // Filter cards by searchTerm (search both title and button.subject)
+  const filteredCards = cards.filter((c) => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      c.title.toLowerCase().includes(q) ||
+      c.desc.toLowerCase().includes(q) ||
+      c.button.subject.toLowerCase().includes(q)
+    );
+  });
 
   const ClassCard = ({ kelas, mapel }: { kelas: string; mapel: string[] }) => {
     const selected = tempSelected === kelas;
@@ -135,13 +179,11 @@ export default function PembelajaranPopuler() {
             placeholder="Mau belajar apa hari ini?...."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" && alert(`Cari: ${searchTerm}`)
-            }
             className="flex-1 outline-none text-gray-700 placeholder-gray-400"
           />
           <Search className="w-5 h-5 text-gray-500" />
         </div>
+
         <button
           onClick={() => setShowModal(true)}
           className="ml-4 bg-blue-700 text-white rounded-md px-6 py-3 font-semibold hover:bg-blue-800 focus:outline-none"
@@ -172,7 +214,7 @@ export default function PembelajaranPopuler() {
             ref={scrollRef}
             className="flex gap-6 scroll-smooth overflow-x-auto no-scrollbar py-2"
           >
-            {cards.map((card, i) => {
+            {filteredCards.map((card, i) => {
               const Icon = card.button.icon;
               return (
                 <motion.div
@@ -180,13 +222,13 @@ export default function PembelajaranPopuler() {
                   whileHover={{ y: -8 }}
                   className="rounded-lg bg-white text-gray-800 flex flex-col overflow-hidden border hover:shadow-lg transition-all duration-300 ease-out h-full w-[250px] flex-shrink-0"
                 >
-                  <a href={card.link} target="_blank" className="block cursor-pointer">
-                  <img
-                    src={card.image}
-                    alt={card.title}
-                    className="pointer-events-none mx-auto h-40 w-full object-cover object-top"
-                  />
-                </a>
+                  <a href={card.link} target="_blank" rel="noreferrer" className="block cursor-pointer">
+                    <img
+                      src={card.image}
+                      alt={card.title}
+                      className="pointer-events-none mx-auto h-40 w-full object-cover object-top"
+                    />
+                  </a>
                   <div className="flex flex-col px-3 py-2 flex-grow">
                     <h3 className="font-semibold tracking-tight text-base text-gray-800">
                       {card.title}
@@ -206,14 +248,16 @@ export default function PembelajaranPopuler() {
                     </div>
                   </div>
                   <div className="flex items-center justify-start px-3 pb-2 pt-1">
-                    <a
-                      href={card.link}
-                      target="_blank"
-                      className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-2 py-1 rounded-md transition-all"
+                    <button
+                      onClick={() => {
+                        // buka subject sesuai slug (card.button.slug)
+                        onOpenSubject(card.button.slug);
+                      }}
+                      className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-[12px] px-3 py-1 rounded-md transition-all"
                     >
-                      <Icon className="w-3 h-3" />
+                      <Icon className="w-4 h-4" />
                       {card.button.subject}
-                    </a>
+                    </button>
                   </div>
                 </motion.div>
               );
@@ -231,7 +275,7 @@ export default function PembelajaranPopuler() {
 
       {/* Pagination */}
       <div className="flex gap-2 mt-8">
-        {cards.slice(0, cards.length - 3).map((_, i) => (
+        {filteredCards.slice(0, filteredCards.length - 2).map((_, i) => (
           <div
             key={i}
             className={`w-2 h-2 rounded-full ${
@@ -254,8 +298,8 @@ export default function PembelajaranPopuler() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl shadow-xl p-8 w-[500px] relative"
+              transition={{ duration: 0.28 }}
+              className="bg-white rounded-2xl shadow-xl p-8 w-[520px] relative"
             >
               <button
                 onClick={() => setShowModal(false)}
@@ -263,23 +307,32 @@ export default function PembelajaranPopuler() {
               >
                 <X size={20} />
               </button>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                Pilih Kelas
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Pilih Kelas</h3>
               <div className="grid grid-cols-2 gap-4">
-                {Object.entries(subjects).map(([kelas, mapel]) => (
+                {Object.entries(subjectsByClass).map(([kelas, mapel]) => (
                   <ClassCard key={kelas} kelas={kelas} mapel={mapel} />
                 ))}
               </div>
-              <button
-                onClick={() => {
-                  setSelectedClass(tempSelected);
-                  setShowModal(false);
-                }}
-                className="mt-6 w-full py-2 bg-blue-700 text-white rounded-md font-semibold hover:bg-blue-800 transition-all"
-              >
-                Selesai
-              </button>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => {
+                    setSelectedClass(tempSelected);
+                    setShowModal(false);
+                  }}
+                  className="flex-1 py-2 bg-blue-700 text-white rounded-md font-semibold hover:bg-blue-800 transition"
+                >
+                  Selesai
+                </button>
+                <button
+                  onClick={() => {
+                    setTempSelected(selectedClass); // reset
+                    setShowModal(false);
+                  }}
+                  className="flex-1 py-2 border rounded-md font-semibold"
+                >
+                  Batal
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Kelas {
+  id     Int     @id @default(autoincrement())
+  nama   String
+  mapels Mapel[]
+}
+
+model Mapel {
+  id        Int       @id @default(autoincrement())
+  nama      String
+  slug      String    @unique
+  ilustrasi String?
+  kelasId   Int
+  kelas     Kelas     @relation(fields: [kelasId], references: [id])
+  videos    Video[]
+  teachers  Teacher[]
+}
+
+model Video {
+  id      Int    @id @default(autoincrement())
+  judul   String
+  url     String
+  mapelId Int
+  mapel   Mapel @relation(fields: [mapelId], references: [id])
+}
+
+model Teacher {
+  id      Int    @id @default(autoincrement())
+  nama    String
+  avatar  String?
+  mapelId Int
+  mapel   Mapel @relation(fields: [mapelId], references: [id])
+}
