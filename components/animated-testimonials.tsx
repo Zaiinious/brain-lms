@@ -63,7 +63,6 @@ export function AnimatedTestimonials({
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
       },
     },
   }
@@ -101,6 +100,7 @@ export function AnimatedTestimonials({
         >
           {/* Left side: Heading and navigation */}
           <motion.div variants={itemVariants} className="flex flex-col justify-center">
+            <h2 className="sr-only">{title}</h2>
             <div className="space-y-6">
               {badgeText && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
@@ -161,7 +161,7 @@ export function AnimatedTestimonials({
 
                   <div className="relative mb-6 flex-1">
                     <Quote className="absolute -top-2 -left-2 h-8 w-8 text-blue-400 rotate-180" />
-                    <p className="relative z-10 text-lg font-medium leading-relaxed">"{testimonial.content}"</p>
+                    <p className="relative z-10 text-lg font-medium leading-relaxed">&ldquo;{testimonial.content}&rdquo;</p>
                   </div>
 
                   <Separator className="my-4" />

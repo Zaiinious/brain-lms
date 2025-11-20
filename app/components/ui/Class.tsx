@@ -7,8 +7,14 @@ import { X } from "lucide-react";
 
 export default function KelasPage() {
   const kelasList = [10, 11, 12, 13];
+  interface MapelItem {
+    title: string;
+    imgSrc: string;
+    imgAlt: string;
+    variant: "default" | "red" | "blue" | "gray";
+  }
 
-  const mapelData = {
+  const mapelData: Record<number, MapelItem[]> = {
     10: [
       {
         title: "Matematika",
@@ -64,6 +70,10 @@ export default function KelasPage() {
   const [kelasDipilih, setKelasDipilih] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  // Guarded selected mapel to avoid indexing with `null` in JSX
+  const selectedMapel: MapelItem[] =
+    kelasDipilih !== null ? mapelData[kelasDipilih] : [];
+
   const handleSelect = (kelas: number) => {
     setKelasDipilih(kelas);
     setShowModal(false);
@@ -99,7 +109,7 @@ export default function KelasPage() {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {mapelData[kelasDipilih].map((m) => (
+            {selectedMapel.map((m) => (
               <motion.div
                 key={m.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -110,7 +120,7 @@ export default function KelasPage() {
                   href="#"
                   imgSrc={m.imgSrc}
                   imgAlt={m.imgAlt}
-                  variant={m.variant as any}
+                  variant={m.variant}
                   className="min-h-[180px]"
                 />
               </motion.div>

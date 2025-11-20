@@ -1,6 +1,11 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+
+// Workaround: alias motion components to loose-typed components to avoid
+// conflicts between React DOM event types and Framer Motion prop types.
+const MotionDiv = motion.div as unknown as React.ComponentType<any>;
+const MotionImg = motion.img as unknown as React.ComponentType<any>;
 import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils"; // Your shadcn/ui utils file
@@ -48,31 +53,31 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
   ({ className, variant, title, href, imgSrc, imgAlt, ...props }, ref) => {
     
     // Animation variants for Framer Motion
-    const cardAnimation = {
+    const cardAnimation: Variants = {
       hover: {
         scale: 1.02,
         transition: { duration: 0.3 },
       },
     };
 
-    const imageAnimation = {
+    const imageAnimation: Variants = {
       hover: {
         scale: 1.1,
         rotate: 3,
         x: 10,
-        transition: { duration: 0.4, ease: "easeInOut" },
+        transition: { duration: 0.4 },
       },
     };
     
-    const arrowAnimation = {
-        hover: {
-            x: 5,
-            transition: { duration: 0.3, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" as const },
-        }
+    const arrowAnimation: Variants = {
+      hover: {
+        x: 5,
+        transition: { duration: 0.3, repeat: Infinity, repeatType: "reverse" as const },
+      }
     }
 
     return (
-      <motion.div
+      <MotionDiv
         className={cn(cardVariants({ variant, className }))}
         ref={ref}
         variants={cardAnimation}
@@ -87,19 +92,19 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
             className="mt-auto flex items-center text-sm font-semibold group-hover:underline"
           >
             LEARN MORE
-            <motion.div variants={arrowAnimation}>
-                <ArrowRight className="ml-2 h-4 w-4" />
-            </motion.div>
+            <MotionDiv variants={arrowAnimation}>
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </MotionDiv>
           </a>
         </div>
         
-        <motion.img
+        <MotionImg
           src={imgSrc}
           alt={imgAlt}
           className="absolute -right-8 -bottom-8 w-40 h-40 object-contain opacity-90 group-hover:opacity-100"
           variants={imageAnimation}
         />
-      </motion.div>
+      </MotionDiv>
     );
   }
 );
