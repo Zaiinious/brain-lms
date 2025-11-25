@@ -13,14 +13,12 @@ export default function Page() {
   const [selectedClass, setSelectedClass] = useState<string>("10");
   const [tempClass, setTempClass] = useState<string>("10");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
   const router = useRouter();
 
   // ketika user memilih subject dari modal atau klik card
-  const handleOpenSubject = (slug: string) => {
-    setSelectedSubject(slug);
-    // navigate ke page mapel (pastikan route ada /mapel/[slug]/page.tsx)
-    router.push(`/mapel/${slug}`);
+  const handleOpenSubject = (path: string) => {
+    // navigate ke page mapel
+    router.push(path);
   };
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 import { Dialog } from "@headlessui/react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Subject {
   name: string;
@@ -26,10 +27,10 @@ export default function SubjectModal({ open, onClose, subjects }: SubjectModalPr
           {(subjects ?? []).map((s) => (
             <Link
               key={s.name}
-              href={`/mapel/${s.slug}`}
+              href={`/kelas/mapel/${s.slug}`}
               className="flex flex-col items-center p-3 hover:bg-gray-100 rounded-xl transition"
             >
-              <img src={s.icon} alt={s.name} className="w-14 h-14" />
+              <Image src={s.icon} alt={s.name} width={56} height={56} unoptimized className="w-14 h-14" />
               <span className="mt-2 text-sm font-medium">{s.name}</span>
             </Link>
           ))}

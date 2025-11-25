@@ -21,10 +21,10 @@ export default function SubjectGrid({ subjects = [], onOpenAll }: SubjectGridPro
       {preview.map((s) => (
         <Link
           key={s.name}
-          href={`/mapel/${s.slug}`}
+          href={`/kelas/mapel/${s.slug}`}
           className="w-28 shrink-0 p-4 bg-white rounded-2xl shadow-sm flex flex-col items-center"
         >
-          <Image src={s.icon} alt={s.name} width={48} height={48} className="w-12 h-12" />
+          <Image src={s.icon} alt={s.name} width={48} height={48} unoptimized className="w-12 h-12" />
           <span className="mt-2 text-sm text-gray-700">{s.name}</span>
         </Link>
       ))}
@@ -34,7 +34,7 @@ export default function SubjectGrid({ subjects = [], onOpenAll }: SubjectGridPro
         onClick={onOpenAll}
         className="w-28 shrink-0 p-4 bg-white rounded-2xl shadow-sm flex flex-col items-center"
       >
-        <Image src="https://img.icons8.com/color/96/menu.png" alt="Semua" width={48} height={48} className="w-12 h-12" />
+        <Image src="https://img.icons8.com/color/96/menu.png" alt="Semua" width={48} height={48} unoptimized className="w-12 h-12" />
         <span className="mt-2 text-sm text-gray-700">Semua Pelajaran</span>
       </button>
     </div>

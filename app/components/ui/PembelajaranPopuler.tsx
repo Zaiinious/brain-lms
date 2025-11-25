@@ -1,6 +1,7 @@
 // app/components/ui/PembelajaranPopuler.tsx
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -51,7 +52,7 @@ export default function PembelajaranPopuler({
     {
       title: "Chat Collect",
       desc: "SaaS yang membantu mengumpulkan email pengguna GPT.",
-      image: "https://source.unsplash.com/600x400/?chat,ai",
+      image: "https://picsum.photos/600/400?random=1",
       link: "https://chatcollect.com",
       stack: ["Next.js", "Typescript", "PostgreSQL", "Prisma"],
       button: {
@@ -63,7 +64,7 @@ export default function PembelajaranPopuler({
     {
       title: "Edu Vision",
       desc: "Platform interaktif untuk materi pembelajaran visual.",
-      image: "https://source.unsplash.com/600x400/?education,visual",
+      image: "https://picsum.photos/600/400?random=2",
       link: "#",
       stack: ["React", "Node.js", "MongoDB", "Shadcn UI"],
       button: {
@@ -75,7 +76,7 @@ export default function PembelajaranPopuler({
     {
       title: "DesignFlow",
       desc: "Alat bantu kolaborasi desainer dengan real-time feedback.",
-      image: "https://source.unsplash.com/600x400/?design,collaboration",
+      image: "https://picsum.photos/600/400?random=3",
       link: "#",
       stack: ["Figma API", "Next.js", "Framer Motion"],
       button: {
@@ -87,7 +88,7 @@ export default function PembelajaranPopuler({
     {
       title: "CodeQuest",
       desc: "Game edukatif untuk belajar coding dari dasar.",
-      image: "https://source.unsplash.com/600x400/?coding,game",
+      image: "https://picsum.photos/600/400?random=4",
       link: "#",
       stack: ["React", "Supabase", "TailwindCSS"],
       button: {
@@ -99,7 +100,7 @@ export default function PembelajaranPopuler({
     {
       title: "NetworkPro",
       desc: "Simulasi jaringan sederhana untuk siswa SMK.",
-      image: "https://source.unsplash.com/600x400/?network,simulation",
+      image: "https://picsum.photos/600/400?random=5",
       link: "#",
       stack: ["Python", "FastAPI", "PostgreSQL"],
       button: {
@@ -111,7 +112,7 @@ export default function PembelajaranPopuler({
     {
       title: "SmartClass",
       desc: "Sistem pembelajaran berbasis IoT untuk sekolah digital.",
-      image: "https://source.unsplash.com/600x400/?iot,classroom",
+      image: "https://picsum.photos/600/400?random=6",
       link: "#",
       stack: ["IoT", "MQTT", "Node.js"],
       button: {
@@ -223,9 +224,12 @@ export default function PembelajaranPopuler({
                   className="rounded-lg bg-white text-gray-800 flex flex-col overflow-hidden border hover:shadow-lg transition-all duration-300 ease-out h-full w-[250px] flex-shrink-0"
                 >
                   <a href={card.link} target="_blank" rel="noreferrer" className="block cursor-pointer">
-                    <img
+                    <Image
                       src={card.image}
                       alt={card.title}
+                      width={600}
+                      height={400}
+                      unoptimized
                       className="pointer-events-none mx-auto h-40 w-full object-cover object-top"
                     />
                   </a>
@@ -251,7 +255,7 @@ export default function PembelajaranPopuler({
                     <button
                       onClick={() => {
                         // buka subject sesuai slug (card.button.slug)
-                        onOpenSubject(card.button.slug);
+                        onOpenSubject(`/kelas/mapel/${card.button.slug}`);
                       }}
                       className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-[12px] px-3 py-1 rounded-md transition-all"
                     >

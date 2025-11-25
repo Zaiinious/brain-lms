@@ -4,10 +4,26 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "source.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.icons8.com",
+      },
+      {
+        protocol: "https",
         hostname: "i.pravatar.cc",
       },
-    ],
-  },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      }
+    ]
+  }
 };
 
 module.exports = nextConfig;

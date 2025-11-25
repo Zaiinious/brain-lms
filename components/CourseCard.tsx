@@ -67,6 +67,7 @@ export default function CourseCard({
           alt={title}
           width={180}
           height={180}
+          unoptimized
           className="object-contain drop-shadow-xl"
         />
       </div>
