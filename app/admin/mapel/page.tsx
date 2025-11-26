@@ -9,6 +9,7 @@ export default function AdminMapel() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ name: '', slug: '' });
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -24,8 +25,13 @@ export default function AdminMapel() {
     e.preventDefault();
     setError(null);
     if (!form.name.trim()) { setError('Nama mapel diperlukan'); return; }
-    const res = await fetch('/api/admin/mapel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-    if (res.ok) { setForm({ name: '', slug: '' }); await fetchAll(); }
+    if (editingId) {
+      const res = await fetch('/api/admin/mapel', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+      if (res.ok) { setEditingId(null); setForm({ name: '', slug: '' }); await fetchAll(); }
+    } else {
+      const res = await fetch('/api/admin/mapel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      if (res.ok) { setForm({ name: '', slug: '' }); await fetchAll(); }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -33,6 +39,14 @@ export default function AdminMapel() {
     await fetch('/api/admin/mapel', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
     await fetchAll();
   };
+
+  const startEdit = (item: M) => {
+    setEditingId(item.id);
+    setForm({ name: item.name || '', slug: item.slug || '' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => { setEditingId(null); setForm({ name: '', slug: '' }); setError(null); };
 
   return (
     <main className="min-h-screen p-6 bg-slate-50">
@@ -43,7 +57,10 @@ export default function AdminMapel() {
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nama Mapel" className="border p-2 rounded" />
           <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="Slug" className="border p-2 rounded" />
           <div className="sm:col-span-3">
-            <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">Tambah Mapel</button>
+            <div className="flex gap-2">
+              <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">{editingId ? 'Simpan Perubahan' : 'Tambah Mapel'}</button>
+              {editingId && <button type="button" onClick={cancelEdit} className="mt-2 px-4 py-2 bg-gray-300 text-slate-800 rounded">Batal</button>}
+            </div>
           </div>
         </form>
 
@@ -58,6 +75,7 @@ export default function AdminMapel() {
                   <div className="text-sm text-slate-500">{s.slug}</div>
                 </div>
                 <div className="flex gap-2">
+                  <button onClick={() => startEdit(s)} className="px-3 py-1 bg-yellow-500 text-white rounded">Edit</button>
                   <button onClick={() => handleDelete(s.id)} className="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
                 </div>
               </div>

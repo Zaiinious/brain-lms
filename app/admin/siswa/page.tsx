@@ -9,6 +9,7 @@ export default function AdminSiswa() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ nama: '', kelas: '', asal: '' });
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -27,8 +28,13 @@ export default function AdminSiswa() {
       setError('Nama diperlukan');
       return;
     }
-    const res = await fetch('/api/admin/siswa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-    if (res.ok) { setForm({ nama: '', kelas: '', asal: '' }); await fetchAll(); }
+    if (editingId) {
+      const res = await fetch('/api/admin/siswa', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+      if (res.ok) { setEditingId(null); setForm({ nama: '', kelas: '', asal: '' }); await fetchAll(); }
+    } else {
+      const res = await fetch('/api/admin/siswa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      if (res.ok) { setForm({ nama: '', kelas: '', asal: '' }); await fetchAll(); }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -36,6 +42,14 @@ export default function AdminSiswa() {
     await fetch('/api/admin/siswa', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
     await fetchAll();
   };
+
+  const startEdit = (item: S) => {
+    setEditingId(item.id);
+    setForm({ nama: item.nama || '', kelas: item.kelas || '', asal: item.asal || '' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => { setEditingId(null); setForm({ nama: '', kelas: '', asal: '' }); setError(null); };
 
   return (
     <main className="min-h-screen p-6 bg-slate-50">
@@ -47,7 +61,10 @@ export default function AdminSiswa() {
           <input value={form.kelas} onChange={(e) => setForm({ ...form, kelas: e.target.value })} placeholder="Kelas" className="border p-2 rounded" />
           <input value={form.asal} onChange={(e) => setForm({ ...form, asal: e.target.value })} placeholder="Asal Sekolah" className="border p-2 rounded" />
           <div className="sm:col-span-3">
-            <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">Tambah Siswa</button>
+            <div className="flex gap-2">
+              <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">{editingId ? 'Simpan Perubahan' : 'Tambah Siswa'}</button>
+              {editingId && <button type="button" onClick={cancelEdit} className="mt-2 px-4 py-2 bg-gray-300 text-slate-800 rounded">Batal</button>}
+            </div>
           </div>
         </form>
 
@@ -62,6 +79,7 @@ export default function AdminSiswa() {
                   <div className="text-sm text-slate-500">{s.kelas} — {s.asal}</div>
                 </div>
                 <div className="flex gap-2">
+                  <button onClick={() => startEdit(s)} className="px-3 py-1 bg-yellow-500 text-white rounded">Edit</button>
                   <button onClick={() => handleDelete(s.id)} className="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
                 </div>
               </div>

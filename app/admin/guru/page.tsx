@@ -9,6 +9,7 @@ export default function AdminGuru() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ nama: '', mapel: '', bio: '' });
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -27,8 +28,13 @@ export default function AdminGuru() {
       setError('Nama diperlukan');
       return;
     }
-    const res = await fetch('/api/admin/guru', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-    if (res.ok) { setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); }
+    if (editingId) {
+      const res = await fetch('/api/admin/guru', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+      if (res.ok) { setEditingId(null); setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); }
+    } else {
+      const res = await fetch('/api/admin/guru', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      if (res.ok) { setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -36,6 +42,14 @@ export default function AdminGuru() {
     await fetch('/api/admin/guru', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
     await fetchAll();
   };
+
+  const startEdit = (item: G) => {
+    setEditingId(item.id);
+    setForm({ nama: item.nama || '', mapel: item.mapel || '', bio: item.bio || '' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => { setEditingId(null); setForm({ nama: '', mapel: '', bio: '' }); setError(null); };
 
   return (
     <main className="min-h-screen p-6 bg-slate-50">
@@ -47,7 +61,10 @@ export default function AdminGuru() {
           <input value={form.mapel} onChange={(e) => setForm({ ...form, mapel: e.target.value })} placeholder="Mata Pelajaran" className="border p-2 rounded" />
           <input value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} placeholder="Bio singkat" className="border p-2 rounded" />
           <div className="sm:col-span-3">
-            <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">Tambah Guru</button>
+            <div className="flex gap-2">
+              <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">{editingId ? 'Simpan Perubahan' : 'Tambah Guru'}</button>
+              {editingId && <button type="button" onClick={cancelEdit} className="mt-2 px-4 py-2 bg-gray-300 text-slate-800 rounded">Batal</button>}
+            </div>
           </div>
         </form>
 
@@ -62,6 +79,7 @@ export default function AdminGuru() {
                   <div className="text-sm text-slate-500">{s.mapel}</div>
                 </div>
                 <div className="flex gap-2">
+                  <button onClick={() => startEdit(s)} className="px-3 py-1 bg-yellow-500 text-white rounded">Edit</button>
                   <button onClick={() => handleDelete(s.id)} className="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
                 </div>
               </div>
