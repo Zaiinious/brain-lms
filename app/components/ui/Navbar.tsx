@@ -1,17 +1,20 @@
 "use client";
 
-import { ChevronRight, ChevronDown, Menu } from "lucide-react";
-import { useLayoutEffect, useRef, useState, useMemo } from "react";
+import { ChevronRight, ChevronDown, Menu, LogOut, User } from "lucide-react";
+import { useLayoutEffect, useRef, useState, useMemo, useEffect } from "react";
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const menuRef = useRef<(HTMLLIElement | null)[]>([]);
   const [indicator, setIndicator] = useState({ width: 0, left: 0 });
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [user, setUser] = useState<{ nama: string; email: string } | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const menu = useMemo(() => [
     { label: "Home", href: "/" },
@@ -26,6 +29,31 @@ export default function Navbar() {
       { label: "Bantuan", href: "/bantuan" },
     ]},
   ], []);
+
+  useEffect(() => {
+    // Read user from localStorage on client-side hydration
+    const userRaw = localStorage.getItem("blms_current_user");
+    let userData = null;
+    if (userRaw) {
+      try {
+        userData = JSON.parse(userRaw);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    
+    // Use Promise to avoid synchronous setState warning
+    Promise.resolve().then(() => {
+      setUser(userData);
+      setIsHydrated(true);
+    });
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("blms_current_user");
+    setUser(null);
+    router.push("/login");
+  };
 
   useLayoutEffect(() => {
     // compute active element and indicator on client only to avoid SSR/CSR mismatch
@@ -156,14 +184,37 @@ export default function Navbar() {
           </div>
 
           {/* Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            <button className="px-4 py-1 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50">
-              Sign Up
-            </button>
-            <button className="px-4 py-1 text-sm font-medium text-white bg-lime-600 hover:bg-lime-700 rounded-md">
-              Login
-            </button>
-          </div>
+          {isHydrated && (
+            <div className="hidden md:flex items-center gap-3">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => router.push("/profile")}
+                    className="flex items-center gap-2 px-3 py-1 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-100"
+                  >
+                    <User size={16} />
+                    {user.nama}
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/signup" className="px-4 py-1 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50">
+                    Sign Up
+                  </Link>
+                  <Link href="/login" className="px-4 py-1 text-sm font-medium text-white bg-lime-600 hover:bg-lime-700 rounded-md">
+                    Login
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Mobile */}
           <button className="md:hidden p-2 rounded-md hover:bg-gray-100">

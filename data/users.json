@@ -1,0 +1,13 @@
+[
+  {
+    "id": "user_1764151638348",
+    "nama": "Fakhri Zainul Arifin",
+    "kelas": 10,
+    "asal": "SMK TI BAZMA",
+    "minat": "Pemograman",
+    "email": "siswa@example.com",
+    "passwordHash": "dc9dbaa43f5fdd35a2fa5a86962fce0efdb78df6fe969c530608d4e629edec48c5cbd630d5dc36d4664ace503cfa023b5149a1860b67f3c0a50a214ed52518a8",
+    "salt": "f4785cf8f3b0e9ce7b12c7fa54410faa",
+    "createdAt": "2025-11-26T10:07:18.348Z"
+  }
+]

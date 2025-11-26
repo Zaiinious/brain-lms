@@ -3,17 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { kelasList } from "@/data/kelas-mapel";
-
-type LocalUser = {
-  id: string;
-  nama: string;
-  kelas: number | string;
-  asal: string;
-  minat: string;
-  email: string;
-  password: string;
-  createdAt: string;
-};
+import { motion } from "framer-motion";
+import { Eye, EyeOff, Mail, Lock, User as UserIcon, BookOpen, Building2, Sparkles } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -27,6 +18,8 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const validate = () => {
     if (!nama.trim()) return "Nama lengkap wajib diisi.";
@@ -34,7 +27,6 @@ export default function SignupPage() {
     if (!asal.trim()) return "Asal sekolah wajib diisi.";
     if (!minat.trim()) return "Minat wajib diisi.";
     if (!email.trim()) return "Email wajib diisi.";
-    // basic email check
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return "Format email tidak valid.";
     if (password.length < 6) return "Password minimal 6 karakter.";
     if (password !== confirmPassword) return "Password dan konfirmasi tidak cocok.";
@@ -50,107 +42,285 @@ export default function SignupPage() {
       return;
     }
     setSubmitting(true);
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nama, kelas, asal, minat, email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data?.error || 'Pendaftaran gagal');
+          setSubmitting(false);
+          return;
+        }
 
-    // simple demo persistence in localStorage
-    try {
-      const usersRaw = localStorage.getItem("blms_users") || "[]";
-      const users = (JSON.parse(usersRaw) as LocalUser[]);
-      const exists = users.find((u) => u.email === email);
-      if (exists) {
-        setError("Email sudah terdaftar. Silakan login atau gunakan email lain.");
+        setSuccess('Pendaftaran berhasil. Mengalihkan ke login...');
+        setTimeout(() => router.push('/login'), 900);
+      } catch (err) {
+        console.error(err);
+        setError('Terjadi kesalahan saat menghubungi server.');
+      } finally {
         setSubmitting(false);
-        return;
       }
-
-      const newUser = {
-        id: `user_${Date.now()}`,
-        nama,
-        kelas,
-        asal,
-        minat,
-        email,
-        // NOTE: storing plaintext password here is only for demo/local dev purposes
-        password,
-        createdAt: new Date().toISOString(),
-      };
-
-      users.push(newUser as LocalUser);
-      localStorage.setItem("blms_users", JSON.stringify(users));
-
-      setSuccess("Pendaftaran berhasil. Anda akan diarahkan ke halaman login...");
-      setTimeout(() => {
-        router.push("/login");
-      }, 1200);
-    } catch (err) {
-      console.error(err);
-      setError("Terjadi kesalahan saat menyimpan data.");
-    } finally {
-      setSubmitting(false);
-    }
+    })();
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-blue-50 flex items-center justify-center py-16 px-6">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8">
-        <h1 className="text-2xl font-bold mb-2">Daftar Akun</h1>
-        <p className="text-sm text-gray-500 mb-6">Isi data pendaftaran untuk membuat akun baru.</p>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center py-8 sm:py-12 md:py-16 px-4 sm:px-6 relative overflow-hidden">
+      {/* Animated gradient blobs */}
+      <motion.div
+        animate={{ y: [0, 20, 0], x: [0, 10, 0] }}
+        transition={{ duration: 6, repeat: Infinity }}
+        className="absolute top-10 left-10 w-24 sm:w-32 h-24 sm:h-32 bg-blue-200 rounded-full opacity-10 blur-3xl"
+      />
+      <motion.div
+        animate={{ y: [0, -20, 0], x: [0, -10, 0] }}
+        transition={{ duration: 8, repeat: Infinity, delay: 1 }}
+        className="absolute bottom-10 right-10 w-28 sm:w-40 h-28 sm:h-40 bg-indigo-200 rounded-full opacity-10 blur-3xl"
+      />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-            <input value={nama} onChange={(e) => setNama(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100" />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-2xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 relative z-10"
+      >
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <Sparkles size={20} />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent break-words">Daftar Akun</h1>
           </div>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Isi data pendaftaran untuk membuat akun baru.</p>
+        </motion.div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Pilih Kelas</label>
-            <select value={kelas === "" ? "" : String(kelas)} onChange={(e) => setKelas(e.target.value ? Number(e.target.value) : "")} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100">
-              <option value="">Pilih kelas...</option>
-              {kelasList.map((k) => (
-                <option key={k.id} value={k.id}>{k.name}</option>
-              ))}
-            </select>
-          </div>
+        <motion.form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nama Lengkap */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15, duration: 0.4 }}
+          >
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
+            <div className="relative">
+              <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Nama lengkap"
+              />
+            </div>
+          </motion.div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Asal Sekolah</label>
-            <input value={asal} onChange={(e) => setAsal(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100" />
-          </div>
+          {/* Pilih Kelas */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label>
+            <div className="relative">
+              <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select
+                value={kelas === "" ? "" : String(kelas)}
+                onChange={(e) => setKelas(e.target.value ? Number(e.target.value) : "")}
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer"
+              >
+                <option value="">Pilih kelas...</option>
+                {kelasList.map((k) => (
+                  <option key={k.id} value={k.id}>{k.name}</option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </div>
+            </div>
+          </motion.div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Minat / Interest</label>
-            <input value={minat} onChange={(e) => setMinat(e.target.value)} placeholder="Contoh: Pemrograman, Desain" className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100" />
-          </div>
+          {/* Asal Sekolah */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
+          >
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Asal Sekolah</label>
+            <div className="relative">
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={asal}
+                onChange={(e) => setAsal(e.target.value)}
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Nama sekolah"
+              />
+            </div>
+          </motion.div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100" />
-          </div>
+          {/* Minat */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Minat / Interest</label>
+            <div className="relative">
+              <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={minat}
+                onChange={(e) => setMinat(e.target.value)}
+                placeholder="Contoh: Pemrograman, Desain"
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+              />
+            </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Email */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.35, duration: 0.4 }}
+          >
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                placeholder="email@example.com"
+              />
+            </div>
+          </motion.div>
+
+          {/* Passwords Grid */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.4 }}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+          >
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100" />
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                  placeholder="Min. 6 karakter"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
-              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100" />
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                  placeholder="Ulangi"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((s) => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
-          {error && <div className="text-sm text-red-600">{error}</div>}
-          {success && <div className="text-sm text-green-600">{success}</div>}
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3 bg-red-50 border-2 border-red-200 text-red-700 rounded-xl text-sm font-medium"
+            >
+              {error}
+            </motion.div>
+          )}
 
-          <div className="pt-2">
-            <button disabled={submitting} className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-60">
-              {submitting ? "Mendaftarkan..." : "Daftar Sekarang"}
-            </button>
-          </div>
+          {/* Success Message */}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3 bg-green-50 border-2 border-green-200 text-green-700 rounded-xl text-sm font-medium"
+            >
+              {success}
+            </motion.div>
+          )}
 
-          <div className="text-sm text-gray-500 text-center">
-            Sudah punya akun? <a href="/login" className="text-blue-600">Masuk</a>
-          </div>
-        </form>
-      </div>
+          {/* Submit Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.4 }}
+            className="pt-4"
+          >
+            <motion.button
+              type="submit"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={submitting}
+              className="w-full px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg active:shadow-md transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {submitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  >
+                    ○
+                  </motion.div>
+                  Mendaftarkan...
+                </span>
+              ) : (
+                "Daftar Sekarang"
+              )}
+            </motion.button>
+          </motion.div>
+
+          {/* Login Link */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="text-xs sm:text-sm text-gray-600 text-center"
+          >
+            Sudah punya akun?{" "}
+            <a href="/login" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              Masuk di sini
+            </a>
+          </motion.div>
+        </motion.form>
+      </motion.div>
     </main>
   );
 }
