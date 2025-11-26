@@ -23,8 +23,10 @@ export async function POST(req: Request) {
     const derived = scryptSync(password, user.salt, 64).toString('hex');
     if (derived !== user.passwordHash) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
-    // Exclude secret fields before returning
-    const { passwordHash, salt, ...safeUserPublic } = user as StoredUser;
+    // Exclude secret fields before returning by cloning and deleting them.
+    const safeUserPublic = { ...(user as StoredUser) } as Record<string, unknown>;
+    delete safeUserPublic.passwordHash;
+    delete safeUserPublic.salt;
 
     return NextResponse.json({ user: safeUserPublic }, { status: 200 });
   } catch (err) {
