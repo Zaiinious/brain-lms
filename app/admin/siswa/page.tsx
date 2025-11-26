@@ -47,7 +47,7 @@ export default function AdminSiswa() {
     }
     if (editingId) {
       const res = await fetch('/api/admin/siswa', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
-      if (res.ok) { setEditingId(null); setForm({ nama: '', kelas: '', asal: '' }); await fetchAll(); }
+      if (res.ok) { setEditingId(null); setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); }
     } else {
       const res = await fetch('/api/admin/siswa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       if (res.ok) { setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); }
@@ -62,11 +62,11 @@ export default function AdminSiswa() {
 
   const startEdit = (item: S) => {
     setEditingId(item.id);
-    setForm({ nama: item.nama || '', kelas: item.kelas || '', asal: item.asal || '' });
+    setForm({ nama: item.nama || '', kelas: item.kelas || '', asal: item.asal || '', minat: item.minat || '', email: item.email || '', password: '', confirmPassword: '' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const cancelEdit = () => { setEditingId(null); setForm({ nama: '', kelas: '', asal: '' }); setError(null); };
+  const cancelEdit = () => { setEditingId(null); setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); setError(null); };
 
   return (
     <main className="min-h-screen p-6 bg-slate-50">
