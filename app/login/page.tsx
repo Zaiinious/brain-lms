@@ -85,22 +85,24 @@ export default function LoginPage() {
           <p className="text-xs sm:text-sm text-gray-500 mt-1">Gunakan email dan password untuk masuk.</p>
         </motion.div>
 
-        <motion.form onSubmit={handleSubmit} className="space-y-4">
+        <motion.form onSubmit={handleSubmit} className="space-y-4" aria-describedby={error ? 'login-error' : success ? 'login-success' : undefined}>
           {/* Email Field */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+            <label htmlFor="login-email" className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="email"
+                id="login-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 placeholder="email@example.com"
+                aria-invalid={!!error}
               />
             </div>
           </motion.div>
@@ -111,20 +113,24 @@ export default function LoginPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+            <label htmlFor="login-password" className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type={showPassword ? 'text' : 'password'}
+                id="login-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 placeholder="Password"
+                aria-invalid={!!error}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-pressed={showPassword}
+                aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -134,6 +140,9 @@ export default function LoginPage() {
           {/* Error Message */}
           {error && (
             <motion.div
+              id="login-error"
+              role="alert"
+              aria-live="assertive"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -146,6 +155,9 @@ export default function LoginPage() {
           {/* Success Message */}
           {success && (
             <motion.div
+              id="login-success"
+              role="status"
+              aria-live="polite"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -167,6 +179,7 @@ export default function LoginPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               disabled={submitting}
+              aria-disabled={submitting}
               className="w-full px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg active:shadow-md transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? (

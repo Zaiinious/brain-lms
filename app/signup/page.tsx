@@ -103,21 +103,23 @@ export default function SignupPage() {
           <p className="text-xs sm:text-sm text-gray-500 mt-1">Isi data pendaftaran untuk membuat akun baru.</p>
         </motion.div>
 
-        <motion.form onSubmit={handleSubmit} className="space-y-4">
+          <motion.form onSubmit={handleSubmit} className="space-y-4" aria-describedby={error ? 'form-error' : success ? 'form-success' : undefined}>
           {/* Nama Lengkap */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
+            <label htmlFor="nama" className="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
             <div className="relative">
               <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                id="nama"
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 placeholder="Nama lengkap"
+                aria-invalid={!!error}
               />
             </div>
           </motion.div>
@@ -128,10 +130,11 @@ export default function SignupPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label>
+            <label htmlFor="kelas" className="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label>
             <div className="relative">
               <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <select
+                id="kelas"
                 value={kelas === "" ? "" : String(kelas)}
                 onChange={(e) => setKelas(e.target.value ? Number(e.target.value) : "")}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer"
@@ -155,14 +158,16 @@ export default function SignupPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.25, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Asal Sekolah</label>
+            <label htmlFor="asal" className="block text-sm font-semibold text-gray-700 mb-2">Asal Sekolah</label>
             <div className="relative">
               <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                id="asal"
                 value={asal}
                 onChange={(e) => setAsal(e.target.value)}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 placeholder="Nama sekolah"
+                aria-invalid={!!error}
               />
             </div>
           </motion.div>
@@ -173,14 +178,16 @@ export default function SignupPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Minat / Interest</label>
+            <label htmlFor="minat" className="block text-sm font-semibold text-gray-700 mb-2">Minat / Interest</label>
             <div className="relative">
               <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                id="minat"
                 value={minat}
                 onChange={(e) => setMinat(e.target.value)}
                 placeholder="Contoh: Pemrograman, Desain"
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                aria-invalid={!!error}
               />
             </div>
           </motion.div>
@@ -191,15 +198,17 @@ export default function SignupPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.35, duration: 0.4 }}
           >
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="email"
+                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 placeholder="email@example.com"
+                aria-invalid={!!error}
               />
             </div>
           </motion.div>
@@ -212,40 +221,48 @@ export default function SignupPage() {
             className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
           >
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                   placeholder="Min. 6 karakter"
+                  aria-invalid={!!error}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-pressed={showPassword}
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Password</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showConfirm ? 'text' : 'password'}
+                  id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                   placeholder="Ulangi"
+                  aria-invalid={!!error}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm((s) => !s)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-pressed={showConfirm}
+                  aria-label={showConfirm ? 'Sembunyikan konfirmasi password' : 'Tampilkan konfirmasi password'}
                 >
                   {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -256,6 +273,9 @@ export default function SignupPage() {
           {/* Error Message */}
           {error && (
             <motion.div
+              id="form-error"
+              role="alert"
+              aria-live="assertive"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -268,6 +288,9 @@ export default function SignupPage() {
           {/* Success Message */}
           {success && (
             <motion.div
+              id="form-success"
+              role="status"
+              aria-live="polite"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -289,6 +312,7 @@ export default function SignupPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               disabled={submitting}
+              aria-disabled={submitting}
               className="w-full px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg active:shadow-md transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? (

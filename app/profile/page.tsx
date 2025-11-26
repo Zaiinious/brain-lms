@@ -51,13 +51,14 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8 sm:py-12 px-4 sm:px-6">
+    <main aria-labelledby="profile-heading" className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8 sm:py-12 px-4 sm:px-6">
       <div className="max-w-2xl mx-auto w-full">
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-md sm:shadow-lg p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profil Saya</h1>
+            <h1 id="profile-heading" className="text-2xl sm:text-3xl font-bold text-gray-900">Profil Saya</h1>
             <button
               onClick={handleLogout}
+              aria-label="Logout"
               className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm sm:text-base rounded-lg sm:rounded-xl hover:bg-red-700 font-semibold transition-colors active:bg-red-800"
             >
               Logout
@@ -96,9 +97,10 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="mt-8 pt-8 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button
               onClick={() => router.push("/")}
+              aria-label="Kembali ke Home"
               className="flex-1 sm:flex-none px-4 py-2 bg-gray-200 text-gray-900 text-sm sm:text-base rounded-lg sm:rounded-xl hover:bg-gray-300 font-semibold transition-colors active:bg-gray-400"
             >
               Kembali ke Home
