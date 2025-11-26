@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Cloud, Network, Shield, Lightbulb, Bot } from "lucide-react";
+import { Cloud, Shield, Lightbulb, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function KompetensiKeahlian() {
