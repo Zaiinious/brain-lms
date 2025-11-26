@@ -9,5 +9,17 @@
     "passwordHash": "dc9dbaa43f5fdd35a2fa5a86962fce0efdb78df6fe969c530608d4e629edec48c5cbd630d5dc36d4664ace503cfa023b5149a1860b67f3c0a50a214ed52518a8",
     "salt": "f4785cf8f3b0e9ce7b12c7fa54410faa",
     "createdAt": "2025-11-26T10:07:18.348Z"
+  },
+  {
+    "id": "user_admin_20251126",
+    "nama": "Dev Admin",
+    "kelas": 0,
+    "asal": "local",
+    "minat": "admin",
+    "email": "admin@example.com",
+    "role": "admin",
+    "passwordHash": "ddac662f1d60f59e294f36b848e4ced7a71685071c83551be702fc4f27c7184a210f8da4b6c5d78a4ae388e20a3290c51862d6a8f3a67c3f509c2588b31a9371",
+    "salt": "d1280e63597c6b55c59260d3b4ca53b3",
+    "createdAt": "2025-11-26T10:30:00.000Z"
   }
 ]
