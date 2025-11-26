@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Toast from '../../components/ui/Toast';
 
 type M = { id: string; name: string; slug?: string };
 
@@ -10,6 +12,7 @@ export default function AdminMapel() {
   const [form, setForm] = useState({ name: '', slug: '' });
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -25,19 +28,33 @@ export default function AdminMapel() {
     e.preventDefault();
     setError(null);
     if (!form.name.trim()) { setError('Nama mapel diperlukan'); return; }
-    if (editingId) {
-      const res = await fetch('/api/admin/mapel', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
-      if (res.ok) { setEditingId(null); setForm({ name: '', slug: '' }); await fetchAll(); }
-    } else {
-      const res = await fetch('/api/admin/mapel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-      if (res.ok) { setForm({ name: '', slug: '' }); await fetchAll(); }
+    try {
+      if (editingId) {
+        const res = await fetch('/api/admin/mapel', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok) { setEditingId(null); setForm({ name: '', slug: '' }); await fetchAll(); setToast({ message: 'Mapel berhasil diperbarui', type: 'success' }); }
+        else { setToast({ message: j?.error || 'Gagal memperbarui mapel', type: 'error' }); }
+      } else {
+        const res = await fetch('/api/admin/mapel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok) { setForm({ name: '', slug: '' }); await fetchAll(); setToast({ message: 'Mapel berhasil ditambahkan', type: 'success' }); }
+        else { setToast({ message: j?.error || 'Gagal menambahkan mapel', type: 'error' }); }
+      }
+    } catch (err) {
+      setToast({ message: 'Terjadi kesalahan jaringan', type: 'error' });
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus mapel ini?')) return;
-    await fetch('/api/admin/mapel', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    await fetchAll();
+    try {
+      const res = await fetch('/api/admin/mapel', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok) { await fetchAll(); setToast({ message: 'Mapel dihapus', type: 'success' }); }
+      else { setToast({ message: j?.error || 'Gagal menghapus mapel', type: 'error' }); }
+    } catch (err) {
+      setToast({ message: 'Terjadi kesalahan jaringan', type: 'error' });
+    }
   };
 
   const startEdit = (item: M) => {
@@ -51,7 +68,12 @@ export default function AdminMapel() {
   return (
     <main className="min-h-screen p-6 bg-slate-50">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-xl font-bold mb-4">Kelola Mata Pelajaran</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <Link href="/admin" className="text-sm text-blue-600">← Dashboard</Link>
+            <h2 className="text-xl font-bold mt-2">Kelola Mata Pelajaran</h2>
+          </div>
+        </div>
 
         <form onSubmit={handleAdd} className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nama Mapel" className="border p-2 rounded" />

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Toast from '../../components/ui/Toast';
 
 type S = { id: string; nama: string; kelas?: string; asal?: string; minat?: string; email?: string; passwordHash?: string; salt?: string };
 
@@ -11,6 +13,7 @@ export default function AdminSiswa() {
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [kelasOptions, setKelasOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -45,19 +48,33 @@ export default function AdminSiswa() {
     if (form.password || form.confirmPassword) {
       if (form.password !== form.confirmPassword) { setError('Password dan konfirmasi tidak cocok'); return; }
     }
-    if (editingId) {
-      const res = await fetch('/api/admin/siswa', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
-      if (res.ok) { setEditingId(null); setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); }
-    } else {
-      const res = await fetch('/api/admin/siswa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-      if (res.ok) { setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); }
+    try {
+      if (editingId) {
+        const res = await fetch('/api/admin/siswa', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok) { setEditingId(null); setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); setToast({ message: 'Siswa berhasil diperbarui', type: 'success' }); }
+        else { setToast({ message: j?.error || 'Gagal memperbarui siswa', type: 'error' }); }
+      } else {
+        const res = await fetch('/api/admin/siswa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok) { setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); setToast({ message: 'Siswa berhasil ditambahkan', type: 'success' }); }
+        else { setToast({ message: j?.error || 'Gagal menambahkan siswa', type: 'error' }); }
+      }
+    } catch (err) {
+      setToast({ message: 'Terjadi kesalahan jaringan', type: 'error' });
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus siswa ini?')) return;
-    await fetch('/api/admin/siswa', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    await fetchAll();
+    try {
+      const res = await fetch('/api/admin/siswa', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok) { await fetchAll(); setToast({ message: 'Siswa dihapus', type: 'success' }); }
+      else { setToast({ message: j?.error || 'Gagal menghapus siswa', type: 'error' }); }
+    } catch (err) {
+      setToast({ message: 'Terjadi kesalahan jaringan', type: 'error' });
+    }
   };
 
   const startEdit = (item: S) => {
@@ -71,7 +88,12 @@ export default function AdminSiswa() {
   return (
     <main className="min-h-screen p-6 bg-slate-50">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-xl font-bold mb-4">Kelola Siswa</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <Link href="/admin" className="text-sm text-blue-600">← Dashboard</Link>
+            <h2 className="text-xl font-bold mt-2">Kelola Siswa</h2>
+          </div>
+        </div>
 
         <form onSubmit={handleAdd} className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} placeholder="Nama" className="border p-2 rounded" />

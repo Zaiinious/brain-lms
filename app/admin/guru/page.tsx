@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Toast from '../../components/ui/Toast';
 
 type G = { id: string; nama: string; mapel?: string; bio?: string };
 
@@ -10,6 +12,7 @@ export default function AdminGuru() {
   const [form, setForm] = useState({ nama: '', mapel: '', bio: '' });
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -28,19 +31,33 @@ export default function AdminGuru() {
       setError('Nama diperlukan');
       return;
     }
-    if (editingId) {
-      const res = await fetch('/api/admin/guru', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
-      if (res.ok) { setEditingId(null); setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); }
-    } else {
-      const res = await fetch('/api/admin/guru', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-      if (res.ok) { setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); }
+    try {
+      if (editingId) {
+        const res = await fetch('/api/admin/guru', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok) { setEditingId(null); setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); setToast({ message: 'Guru berhasil diperbarui', type: 'success' }); }
+        else { setToast({ message: j?.error || 'Gagal memperbarui guru', type: 'error' }); }
+      } else {
+        const res = await fetch('/api/admin/guru', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok) { setForm({ nama: '', mapel: '', bio: '' }); await fetchAll(); setToast({ message: 'Guru berhasil ditambahkan', type: 'success' }); }
+        else { setToast({ message: j?.error || 'Gagal menambahkan guru', type: 'error' }); }
+      }
+    } catch (err) {
+      setToast({ message: 'Terjadi kesalahan jaringan', type: 'error' });
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus guru ini?')) return;
-    await fetch('/api/admin/guru', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    await fetchAll();
+    try {
+      const res = await fetch('/api/admin/guru', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok) { await fetchAll(); setToast({ message: 'Guru dihapus', type: 'success' }); }
+      else { setToast({ message: j?.error || 'Gagal menghapus guru', type: 'error' }); }
+    } catch (err) {
+      setToast({ message: 'Terjadi kesalahan jaringan', type: 'error' });
+    }
   };
 
   const startEdit = (item: G) => {
@@ -54,7 +71,12 @@ export default function AdminGuru() {
   return (
     <main className="min-h-screen p-6 bg-slate-50">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-xl font-bold mb-4">Kelola Guru</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <Link href="/admin" className="text-sm text-blue-600">← Dashboard</Link>
+            <h2 className="text-xl font-bold mt-2">Kelola Guru</h2>
+          </div>
+        </div>
 
         <form onSubmit={handleAdd} className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} placeholder="Nama" className="border p-2 rounded" />
