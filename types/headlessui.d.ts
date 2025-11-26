@@ -3,9 +3,9 @@ declare module "@headlessui/react" {
 
   // Minimal ambient declarations so `Dialog` can be used in JSX without
   // requiring the real package types during development in this repo.
-  export const Dialog: React.ElementType & {
-    Overlay: React.ElementType;
-    Panel: React.ElementType;
-    Title: React.ElementType;
+  export const Dialog: React.ComponentType<any> & {
+    Overlay: React.ComponentType<any>;
+    Panel: React.ComponentType<any>;
+    Title: React.ComponentType<any>;
   };
 }

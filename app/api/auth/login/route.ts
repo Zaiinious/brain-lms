@@ -20,8 +20,15 @@ export async function POST(req: Request) {
     const user = users.find((u) => u.email === email) as StoredUser | undefined;
     if (!user) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
-    const derived = scryptSync(password, user.salt, 64).toString('hex');
-    if (derived !== user.passwordHash) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    // Ensure stored salt and passwordHash are available and strings
+    const salt = typeof user.salt === 'string' ? user.salt : undefined;
+    const storedHash = typeof user.passwordHash === 'string' ? user.passwordHash : undefined;
+    if (!salt || !storedHash) {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    const derived = scryptSync(password, salt, 64).toString('hex');
+    if (derived !== storedHash) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
     // Exclude secret fields before returning by cloning and deleting them.
     const safeUserPublic = { ...(user as StoredUser) } as Record<string, unknown>;
