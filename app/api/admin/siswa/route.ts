@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { randomBytes, scryptSync } from 'crypto';
 
 const FILE = path.join(process.cwd(), 'data', 'siswa.json');
 
@@ -28,6 +29,18 @@ export async function POST(req: Request) {
   const body = await req.json();
   const items = await readAll();
   const id = String(Date.now());
+
+  // If password provided, derive hash+salt and store them instead of plain password
+  if (body?.password && typeof body.password === 'string' && body.password.length > 0) {
+    const salt = randomBytes(16).toString('hex');
+    const hash = scryptSync(body.password, salt, 64).toString('hex');
+    body.passwordHash = hash;
+    body.salt = salt;
+  }
+  // remove plain password/confirmPassword if present
+  if (body.password) delete body.password;
+  if (body.confirmPassword) delete body.confirmPassword;
+
   const newItem: Siswa = { id, ...body };
   items.unshift(newItem);
   await writeAll(items);
@@ -40,6 +53,16 @@ export async function PUT(req: Request) {
   const items = await readAll();
   const idx = items.findIndex((i) => i.id === body.id);
   if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  // If password provided on update, derive new hash+salt
+  if (body?.password && typeof body.password === 'string' && body.password.length > 0) {
+    const salt = randomBytes(16).toString('hex');
+    const hash = scryptSync(body.password, salt, 64).toString('hex');
+    body.passwordHash = hash;
+    body.salt = salt;
+  }
+  if (body.password) delete body.password;
+  if (body.confirmPassword) delete body.confirmPassword;
+
   items[idx] = { ...items[idx], ...body };
   await writeAll(items);
   return NextResponse.json({ item: items[idx] });

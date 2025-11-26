@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 
-type S = { id: string; nama: string; kelas?: string; asal?: string };
+type S = { id: string; nama: string; kelas?: string; asal?: string; minat?: string; email?: string; passwordHash?: string; salt?: string };
 
 export default function AdminSiswa() {
   const [items, setItems] = useState<S[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ nama: '', kelas: '', asal: '' });
+  const [form, setForm] = useState({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [kelasOptions, setKelasOptions] = useState<Array<{ id: string; name: string }>>([]);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -21,6 +22,19 @@ export default function AdminSiswa() {
 
   useEffect(() => { fetchAll(); }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch('/api/admin/kelas');
+        const j = await r.json();
+        const opts = (j.items || []).map((it: any) => ({ id: it.id, name: it.name }));
+        setKelasOptions(opts);
+      } catch (e) {
+        // ignore
+      }
+    })();
+  }, []);
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -28,12 +42,15 @@ export default function AdminSiswa() {
       setError('Nama diperlukan');
       return;
     }
+    if (form.password || form.confirmPassword) {
+      if (form.password !== form.confirmPassword) { setError('Password dan konfirmasi tidak cocok'); return; }
+    }
     if (editingId) {
       const res = await fetch('/api/admin/siswa', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
       if (res.ok) { setEditingId(null); setForm({ nama: '', kelas: '', asal: '' }); await fetchAll(); }
     } else {
       const res = await fetch('/api/admin/siswa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-      if (res.ok) { setForm({ nama: '', kelas: '', asal: '' }); await fetchAll(); }
+      if (res.ok) { setForm({ nama: '', kelas: '', asal: '', minat: '', email: '', password: '', confirmPassword: '' }); await fetchAll(); }
     }
   };
 
