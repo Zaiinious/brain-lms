@@ -1,5 +1,15 @@
 [
   {
+    "id": "1764215207626",
+    "nama": "Jenul",
+    "kelas": "121",
+    "asal": "SMAN 1 Bogor",
+    "minat": "",
+    "email": "",
+    "password": "",
+    "confirmPassword": ""
+  },
+  {
     "id": "1764167389279",
     "nama": "Fakhri Zainul Arifin",
     "kelas": "11",

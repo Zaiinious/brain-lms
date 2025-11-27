@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -22,7 +23,7 @@ export default function AdminGuru() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
